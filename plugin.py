@@ -27,3 +27,19 @@ class SimpleKeywordReplyBot(Plugin):
                 reply = Reply(ReplyType.TEXT, response)
                 event.reply = reply
                 return
+
+    def will_generate_reply(self, event: Event):
+        # 这个方法会在生成回复之前被调用
+        pass
+
+    def will_decorate_reply(self, event: Event):
+        # 这个方法会在装饰回复之前被调用
+        pass
+
+    def will_send_reply(self, event: Event):
+        # 这个方法会在发送回复之前被调用
+        pass
+
+    def help(self, **kwargs) -> str:
+        # 这个方法用于展示插件的帮助文档
+        return "使用 #keyword_reply 命令来激活这个插件，并回复设定的关键词相关信息。"
