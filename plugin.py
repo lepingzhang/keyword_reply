@@ -26,7 +26,8 @@ class SimpleKeywordReplyBot(Plugin):
             if keyword in msg:
                 reply = Reply(ReplyType.TEXT, response)
                 event.reply = reply
-                return
+                event.bypass()  # 绕过后续插件处理，直接发送回复
+                break  # 匹配到关键词后，不再检查其他关键词
 
     def will_generate_reply(self, event: Event):
         # 这个方法会在生成回复之前被调用
