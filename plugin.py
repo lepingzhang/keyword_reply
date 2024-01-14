@@ -25,20 +25,30 @@ class SimpleKeywordReplyBot(Plugin):
         msg = event.message.content
         for keyword, response in self.keyword_responses.items():
             if keyword in msg:
-                # 检查回复内容是否为图片链接
-                if self.is_image_url(response):
-                    # 如果是图片链接，则发送图片回复
-                    reply = Reply(ReplyType.IMAGE, response)
-                else:
-                    # 否则发送文本回复
-                    reply = Reply(ReplyType.TEXT, response)
-                event.reply = reply
-                event.bypass()  # 绕过后续插件处理，直接发送回复
+                # 使用正则表达式匹配图片链接
+                image_urls = re.findall(r'https?://[^\s]+(?:jpg|jpeg|png|gif)', response)
+                image_url = image_urls[0] if image_urls else ""
+
+                # 移除图片链接，剩下的部分为文本
+                text_part = re.sub(r'https?://[^\s]+(?:jpg|jpeg|png|gif)', '', response).strip()
+
+                # 发送文本部分（如果存在）
+                if text_part:
+                    text_reply = Reply(ReplyType.TEXT, text_part)
+                    event.reply = text_reply
+                    event.bypass()
+
+                # 检查并发送图片链接（如果存在）
+                if self.is_image_url(image_url):
+                    image_reply = Reply(ReplyType.IMAGE, image_url)
+                    event.reply = image_reply
+                    event.bypass()
+
                 break  # 匹配到关键词后，不再检查其他关键词
 
     def is_image_url(self, url: str) -> bool:
-        # 检查链接是否以 .jpg, .jpeg, .png, .gif 结尾
-        return re.match(r'.*\.(jpg|jpeg|png|gif)$', url, re.IGNORECASE) is not None
+        # 检查链接是否是图片链接
+        return re.match(r'https?://[^\s]+(?:jpg|jpeg|png|gif)', url) is not None
 
     def will_generate_reply(self, event: Event):
         # 这个方法会在生成回复之前被调用
