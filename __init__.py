@@ -1,3 +1,3 @@
-from .plugin import App
+from .plugin import SimpleKeywordReplyBot
 
-__all__ = ["App"]
+__all__ = ["SimpleKeywordReplyBot"]
