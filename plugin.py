@@ -1,5 +1,6 @@
 import os
 import json
+import re
 from plugins import register, Plugin, Event, Reply, ReplyType
 
 @register
@@ -24,10 +25,20 @@ class SimpleKeywordReplyBot(Plugin):
         msg = event.message.content
         for keyword, response in self.keyword_responses.items():
             if keyword in msg:
-                reply = Reply(ReplyType.TEXT, response)
+                # 检查回复内容是否为图片链接
+                if self.is_image_url(response):
+                    # 如果是图片链接，则发送图片回复
+                    reply = Reply(ReplyType.IMAGE, response)
+                else:
+                    # 否则发送文本回复
+                    reply = Reply(ReplyType.TEXT, response)
                 event.reply = reply
                 event.bypass()  # 绕过后续插件处理，直接发送回复
                 break  # 匹配到关键词后，不再检查其他关键词
+
+    def is_image_url(self, url: str) -> bool:
+        # 检查链接是否以 .jpg, .jpeg, .png, .gif 结尾
+        return re.match(r'.*\.(jpg|jpeg|png|gif)$', url, re.IGNORECASE) is not None
 
     def will_generate_reply(self, event: Event):
         # 这个方法会在生成回复之前被调用
