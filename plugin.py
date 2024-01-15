@@ -25,43 +25,45 @@ class SimpleKeywordReplyBot(Plugin):
         msg = event.message.content
         for keyword, response in self.keyword_responses.items():
             if keyword in msg:
-                # 使用正则表达式匹配图片链接
-                image_urls = re.findall(r'https?://[^\s]+(?:jpg|jpeg|png|gif)', response)
-                image_url = image_urls[0] if image_urls else ""
+                # 使用正则表达式匹配图片和视频链接
+                image_url_match = re.search(r'https?://[^\s]+(?:jpg|jpeg|png|gif)', response)
+                video_url_match = re.search(r'https?://[^\s]+(?:mp4|avi|mov)', response)
 
-                # 移除图片链接，剩下的部分为文本
-                text_part = re.sub(r'https?://[^\s]+(?:jpg|jpeg|png|gif)', '', response).strip()
-
-                # 发送文本部分（如果存在）
-                if text_part:
-                    text_reply = Reply(ReplyType.TEXT, text_part)
-                    event.reply = text_reply
-                    event.bypass()
-
-                # 检查并发送图片链接（如果存在）
-                if self.is_image_url(image_url):
-                    image_reply = Reply(ReplyType.IMAGE, image_url)
+                if image_url_match:
+                    # 有图片链接
+                    image_reply = Reply(ReplyType.IMAGE, image_url_match.group())
                     event.reply = image_reply
                     event.bypass()
+                    break
+                elif video_url_match:
+                    # 有视频链接
+                    video_reply = Reply(ReplyType.VIDEO, video_url_match.group())
+                    event.reply = video_reply
+                    event.bypass()
+                    break
+                else:
+                    # 只有文本
+                    text_reply = Reply(ReplyType.TEXT, response)
+                    event.reply = text_reply
+                    event.bypass()
+                    break
 
-                break  # 匹配到关键词后，不再检查其他关键词
+
 
     def is_image_url(self, url: str) -> bool:
-        # 检查链接是否是图片链接
         return re.match(r'https?://[^\s]+(?:jpg|jpeg|png|gif)', url) is not None
 
+    def is_video_url(self, url: str) -> bool:
+        return re.match(r'https?://[^\s]+(?:mp4|avi|mov)', url) is not None
+
     def will_generate_reply(self, event: Event):
-        # 这个方法会在生成回复之前被调用
         pass
 
     def will_decorate_reply(self, event: Event):
-        # 这个方法会在装饰回复之前被调用
         pass
 
     def will_send_reply(self, event: Event):
-        # 这个方法会在发送回复之前被调用
         pass
 
     def help(self, **kwargs) -> str:
-        # 这个方法用于展示插件的帮助文档
         return "使用 #keyword_reply 命令来激活这个插件，并回复设定的关键词相关信息。"
