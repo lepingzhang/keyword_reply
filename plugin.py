@@ -29,26 +29,34 @@ class SimpleKeywordReplyBot(Plugin):
                 image_url_match = re.search(r'https?://[^\s]+(?:jpg|jpeg|png|gif)', response)
                 video_url_match = re.search(r'https?://[^\s]+(?:mp4|avi|mov)', response)
 
-                if image_url_match:
-                    # 有图片链接
+                # 分离文本和媒体链接
+                text_part = response
+                if image_url_match or video_url_match:
+                    text_part = re.sub(r'https?://[^\s]+(?:jpg|jpeg|png|gif|mp4|avi|mov)', '', response).strip()
+
+                # 检查是否同时存在文本和媒体链接
+                if (text_part and (image_url_match or video_url_match)):
+                    # 合并文本和媒体链接为一个文本回复
+                    media_url = image_url_match.group() if image_url_match else video_url_match.group()
+                    compound_reply = f"{text_part}\n{media_url}"
+                    event.reply = Reply(ReplyType.TEXT, compound_reply)
+                    event.bypass()
+                elif image_url_match:
+                    # 仅有图片链接
                     image_reply = Reply(ReplyType.IMAGE, image_url_match.group())
                     event.reply = image_reply
                     event.bypass()
-                    break
                 elif video_url_match:
-                    # 有视频链接
+                    # 仅有视频链接
                     video_reply = Reply(ReplyType.VIDEO, video_url_match.group())
                     event.reply = video_reply
                     event.bypass()
-                    break
-                else:
-                    # 只有文本
-                    text_reply = Reply(ReplyType.TEXT, response)
+                elif text_part:
+                    # 仅有文本
+                    text_reply = Reply(ReplyType.TEXT, text_part)
                     event.reply = text_reply
                     event.bypass()
-                    break
-
-
+                break
 
     def is_image_url(self, url: str) -> bool:
         return re.match(r'https?://[^\s]+(?:jpg|jpeg|png|gif)', url) is not None
