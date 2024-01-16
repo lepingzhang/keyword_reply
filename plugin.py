@@ -25,34 +25,32 @@ class SimpleKeywordReplyBot(Plugin):
         msg = event.message.content
         for keyword, response in self.keyword_responses.items():
             if keyword in msg:
-                # 使用正则表达式匹配图片和视频链接
                 image_url_match = re.search(r'https?://[^\s]+(?:jpg|jpeg|png|gif)', response)
                 video_url_match = re.search(r'https?://[^\s]+(?:mp4|avi|mov)', response)
 
-                # 分离文本和媒体链接
-                text_part = response
-                if image_url_match or video_url_match:
-                    text_part = re.sub(r'https?://[^\s]+(?:jpg|jpeg|png|gif|mp4|avi|mov)', '', response).strip()
+                text_part = re.sub(r'https?://[^\s]+(?:jpg|jpeg|png|gif|mp4|avi|mov)', '', response).strip()
 
-                # 检查是否同时存在文本和媒体链接
-                if (text_part and (image_url_match or video_url_match)):
-                    # 合并文本和媒体链接为一个文本回复
+                if text_part and (image_url_match or video_url_match):
+                    text_reply = Reply(ReplyType.TEXT, text_part)
+                    event.channel.send(text_reply, event.message)
+                    
                     media_url = image_url_match.group() if image_url_match else video_url_match.group()
-                    compound_reply = f"{text_part}\n{media_url}"
-                    event.reply = Reply(ReplyType.TEXT, compound_reply)
+                    media_reply_type = ReplyType.IMAGE if image_url_match else ReplyType.VIDEO
+                    media_reply = Reply(media_reply_type, media_url)
+                    event.channel.send(media_reply, event.message)
                     event.bypass()
+
                 elif image_url_match:
-                    # 仅有图片链接
                     image_reply = Reply(ReplyType.IMAGE, image_url_match.group())
                     event.reply = image_reply
                     event.bypass()
+
                 elif video_url_match:
-                    # 仅有视频链接
                     video_reply = Reply(ReplyType.VIDEO, video_url_match.group())
                     event.reply = video_reply
                     event.bypass()
+
                 elif text_part:
-                    # 仅有文本
                     text_reply = Reply(ReplyType.TEXT, text_part)
                     event.reply = text_reply
                     event.bypass()
