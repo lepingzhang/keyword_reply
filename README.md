@@ -6,7 +6,6 @@
 
 ### 1. 添加插件源
 在 `plugins/source.json` 文件中添加以下配置：
-
 ```
 {
   "keyword_reply": {
@@ -17,7 +16,7 @@
 ```
 
 ### 2. 插件配置
-在 config.json 文件中添加以下配置：
+在 `config.json` 文件中添加以下配置：
 ```
 {
   "name": "keyword_reply",
