@@ -14,12 +14,16 @@ class SimpleKeywordReplyBot(Plugin):
     def load_keywords(self):
         dir = os.path.dirname(os.path.abspath(__file__))
         path = os.path.join(dir, 'keywords.json')
+        keyword_responses = {}
         try:
             with open(path, mode='r', encoding='utf-8') as file:
-                return json.load(file)
+                responses = json.load(file)
+                for response, keywords in responses.items():
+                    for keyword in keywords:
+                        keyword_responses[keyword] = response
         except Exception as exc:
             print(f'Failed to load keywords: {exc}')
-            return {}
+        return keyword_responses
 
     def did_receive_message(self, event: Event):
         msg = event.message.content
@@ -33,7 +37,7 @@ class SimpleKeywordReplyBot(Plugin):
                 if text_part and (image_url_match or video_url_match):
                     text_reply = Reply(ReplyType.TEXT, text_part)
                     event.channel.send(text_reply, event.message)
-                    
+
                     media_url = image_url_match.group() if image_url_match else video_url_match.group()
                     media_reply_type = ReplyType.IMAGE if image_url_match else ReplyType.VIDEO
                     media_reply = Reply(media_reply_type, media_url)
@@ -54,7 +58,7 @@ class SimpleKeywordReplyBot(Plugin):
                     text_reply = Reply(ReplyType.TEXT, text_part)
                     event.reply = text_reply
                     event.bypass()
-                break
+                break  # 找到匹配的关键词后即可停止搜索
 
     def is_image_url(self, url: str) -> bool:
         return re.match(r'https?://[^\s]+(?:jpg|jpeg|png|gif)', url) is not None
