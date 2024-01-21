@@ -1,6 +1,6 @@
 # wechat-gptbot关键字回复插件
 
-本项目作为 `[wechat-gptbot](https://github.com/iuiaoin/wechat-gptbot)` 插件，可以根据关键字回复对应的信息。
+本项目作为 `wechat-gptbot` 插件，可以根据关键字回复对应的信息。
 
 ## 安装指南
 
