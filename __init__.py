@@ -1,3 +1,3 @@
-from .plugin import SimpleKeywordReplyBot
+from .keyword_reply import KeywordReply
 
-__all__ = ["SimpleKeywordReplyBot"]
+__all__ = ["KeywordReply"]
