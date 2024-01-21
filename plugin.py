@@ -4,7 +4,7 @@ import re
 from plugins import register, Plugin, Event, Reply, ReplyType
 
 @register
-class SimpleKeywordReplyBot(Plugin):
+class KeywordReply(Plugin):
     name = 'keyword_reply'
 
     def __init__(self, config: dict):
