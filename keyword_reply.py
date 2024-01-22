@@ -28,7 +28,8 @@ class KeywordReply(Plugin):
     def did_receive_message(self, event: Event):
         msg = event.message.content
         for keyword, response in self.keyword_responses.items():
-            if keyword in msg:
+            # 使用正则表达式确保关键词完整匹配（\b表示单词边界）
+            if re.search(r'\b' + re.escape(keyword) + r'\b', msg):
                 image_url_match = re.search(r'https?://[^\s]+(?:jpg|jpeg|png|gif)', response)
                 video_url_match = re.search(r'https?://[^\s]+(?:mp4|avi|mov)', response)
 
