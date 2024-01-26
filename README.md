@@ -30,7 +30,9 @@
 
 ### 3、关键词添加和导出
 3-1：在`keywords.json`中添加 关键词以及对应的回复内容；
+
 3-2：运行`output_commends_clear.py`即可得到`commands.json`；
+
 3-3：将里面的关键词复制粘贴到`config.json`对应位置即可
 
 ### 鸣谢
