@@ -4,7 +4,7 @@
 
 ## 安装指南
 
-### 1. 添加插件源
+### 1、添加插件源
 在 `plugins/source.json` 文件中添加以下配置：
 ```
 {
@@ -15,7 +15,7 @@
 }
 ```
 
-### 2. 插件配置
+### 2、插件配置
 在 `config.json` 文件中添加以下配置：
 ```
 {
@@ -27,6 +27,11 @@
   ]
 }
 ```
+
+### 3、关键词添加和导出
+3-1：在`keywords.json`中添加 关键词以及对应的回复内容；
+3-2：运行`output_commends_clear.py`即可得到`commands.json`；
+3-3：将里面的关键词复制粘贴到`config.json`对应位置即可
 
 ### 鸣谢
 感恩[wechat-douyin-scraper](https://github.com/al-one/wechat-douyin-scraper)项目对本插件的支持和启发。
