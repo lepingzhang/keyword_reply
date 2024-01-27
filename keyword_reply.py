@@ -22,8 +22,8 @@ class KeywordReply(Plugin):
                     for keyword in keywords:
                         keyword_responses[keyword] = response
         except Exception as exc:
-            # 如果需要，可以记录错误日志
-            # print(f'Failed to load keywords: {exc}')
+            # 返回空字典或者其他合适的默认值
+            return keyword_responses
         return keyword_responses
 
     def did_receive_message(self, event: Event):
