@@ -22,7 +22,8 @@ class KeywordReply(Plugin):
                     for keyword in keywords:
                         keyword_responses[keyword] = response
         except Exception as exc:
-            print(f'Failed to load keywords: {exc}')
+            # 如果需要，可以记录错误日志
+            # print(f'Failed to load keywords: {exc}')
         return keyword_responses
 
     def did_receive_message(self, event: Event):
@@ -31,17 +32,27 @@ class KeywordReply(Plugin):
         is_at = event.message.is_at
 
         if is_group and is_at:
-            # 使用正则表达式分割消息，以处理不同类型的空白字符
-            parts = re.split(r'\s+', msg, maxsplit=1)
-            if len(parts) > 1:
-                msg = parts[1].strip()
-            else:
-                msg = parts[0].strip()
+            msg = re.sub(r'@[\w]+\s+', '', msg, count=1).strip()
 
         for keyword, response in self.keyword_responses.items():
             if re.search(r'\b' + re.escape(keyword) + r'\b', msg):
-                text_reply = Reply(ReplyType.TEXT, response)
-                event.reply = text_reply
+                image_url_match = re.search(r'https?://[^\s]+(?:jpg|jpeg|png|gif)', response)
+                video_url_match = re.search(r'https?://[^\s]+(?:mp4|avi|mov)', response)
+
+                text_part = re.sub(r'https?://[^\s]+(?:jpg|jpeg|png|gif|mp4|avi|mov)', '', response).strip()
+
+                if text_part:
+                    text_reply = Reply(ReplyType.TEXT, text_part)
+                    event.channel.send(text_reply, event.message)
+
+                if image_url_match:
+                    image_reply = Reply(ReplyType.IMAGE, image_url_match.group())
+                    event.channel.send(image_reply, event.message)
+
+                if video_url_match:
+                    video_reply = Reply(ReplyType.VIDEO, video_url_match.group())
+                    event.channel.send(video_reply, event.message)
+
                 event.bypass()
                 break
 
