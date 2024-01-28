@@ -19,7 +19,11 @@
 在 `config.json` 文件中添加以下配置：
 ```
 {
-  "name": "keyword_reply"
+  "plugins": [
+    {
+      "name": "keyword_reply"
+    }
+  ]
 }
 ```
 
