@@ -30,9 +30,7 @@ class KeywordReply(Plugin):
         is_group = event.message.is_group
         is_at = event.message.is_at
 
-        # 如果是群聊并且艾特了机器人，尝试去除艾特部分
         if is_group and is_at:
-            # 使用正则表达式去除艾特部分和后面的空白字符
             msg = re.sub(r'@[\w]+\s+', '', msg, count=1).strip()
 
         for keyword, response in self.keyword_responses.items():
@@ -42,17 +40,14 @@ class KeywordReply(Plugin):
 
                 text_part = re.sub(r'https?://[^\s]+(?:jpg|jpeg|png|gif|mp4|avi|mov)', '', response).strip()
 
-                # 如果有文本部分，发送文本消息
                 if text_part:
                     text_reply = Reply(ReplyType.TEXT, text_part)
                     event.channel.send(text_reply, event.message)
 
-                # 如果有图片链接，发送图片消息
                 if image_url_match:
                     image_reply = Reply(ReplyType.IMAGE, image_url_match.group())
                     event.channel.send(image_reply, event.message)
 
-                # 如果有视频链接，发送视频消息
                 if video_url_match:
                     video_reply = Reply(ReplyType.VIDEO, video_url_match.group())
                     event.channel.send(video_reply, event.message)
