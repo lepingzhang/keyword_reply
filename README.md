@@ -28,7 +28,8 @@
 ```
 
 ### 3、关键词添加和导出
-3-1：在`keywords.json`中添加 关键词以及对应的回复内容；
+3-1：在`keywords.json`中添加关键词以及对应的回复内容；
+3-2: `keywords.json`可以单独更新而无需重启插件。
 
 ~~3-2：运行`output_commends_clear.py`即可得到`commands.json`；~~
 
