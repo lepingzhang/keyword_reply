@@ -2,6 +2,7 @@ import os
 import json
 import re
 from plugins import register, Plugin, Event, Reply, ReplyType
+import time
 
 @register
 class KeywordReply(Plugin):
@@ -9,23 +10,24 @@ class KeywordReply(Plugin):
 
     def __init__(self, config: dict):
         super().__init__(config)
-        self.keyword_responses = self.load_keywords()
+        self.keywords_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'keywords.json')
+        self.keyword_responses = {}
+        self.file_last_modified = 0
+        self.load_keywords()
 
     def load_keywords(self):
-        dir = os.path.dirname(os.path.abspath(__file__))
-        path = os.path.join(dir, 'keywords.json')
-        keyword_responses = {}
         try:
-            with open(path, mode='r', encoding='utf-8') as file:
-                responses = json.load(file)
-                for response, keywords in responses.items():
-                    for keyword in keywords:
-                        keyword_responses[keyword] = response
+            last_modified = os.path.getmtime(self.keywords_file_path)
+            if last_modified != self.file_last_modified:
+                with open(self.keywords_file_path, mode='r', encoding='utf-8') as file:
+                    responses = json.load(file)
+                    self.keyword_responses = {keyword: response for response in responses for keyword in responses[response]}
+                    self.file_last_modified = last_modified
         except Exception as exc:
             print(f'Failed to load keywords: {exc}')
-        return keyword_responses
 
     def did_receive_message(self, event: Event):
+        self.load_keywords()
         msg = event.message.content
         is_group = event.message.is_group
         is_at = event.message.is_at
@@ -56,7 +58,7 @@ class KeywordReply(Plugin):
                 break
 
     def help(self, **kwargs) -> str:
-        return "使用 #keyword_reply 命令来激活这个插件，并回复设定的关键词相关信息。"
+        return "根据关键词回复设定的相关信息"
 
     def will_generate_reply(self, event: Event):
         pass
